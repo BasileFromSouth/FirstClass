@@ -1,0 +1,36 @@
+# Publie Storybook sur Chromatic à chaque push (URL publique + revue visuelle).
+# Prérequis : secret GitHub CHROMATIC_PROJECT_TOKEN (voir https://www.chromatic.com/docs/github-actions)
+name: Chromatic
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+concurrency:
+  group: chromatic-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromatic:
+    name: Publish Storybook to Chromatic
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish to Chromatic
+        run: npx chromatic --project-token="$CHROMATIC_PROJECT_TOKEN" --exit-zero-on-changes --ci
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}

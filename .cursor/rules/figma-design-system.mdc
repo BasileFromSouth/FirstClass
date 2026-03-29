@@ -1,0 +1,67 @@
+---
+description: Rules for implementing Figma designs via the Figma MCP server in this Next.js design system repo. Covers tokens, Storybook components, Tailwind v4, and the required design-context workflow.
+globs:
+  - "src/**/*.tsx"
+  - "src/**/*.ts"
+  - "src/**/*.css"
+alwaysApply: false
+---
+
+# Figma → code (Stoodio design system)
+
+## Next.js
+
+- This project uses **Next.js 16** with APIs that can differ from older docs. Before using App Router APIs, layouts, or config, read the relevant guide under `node_modules/next/dist/docs/` and follow current patterns. See also `AGENTS.md` in the repo root.
+
+## Où vit le design system
+
+- **Composants UI** : `src/stories/` — un composant par fichier PascalCase (`Button.tsx`, `Header.tsx`, …), avec styles co-localisés (`button.css`, `header.css`, …) importés depuis le `.tsx`.
+- **Stories Storybook** : `src/stories/*.stories.ts` (addon docs, a11y, designs activés côté Storybook).
+- **Styles globaux & tokens CSS** : `src/app/globals.css` — importé par `src/app/layout.tsx` et par `.storybook/preview.ts` pour que Storybook et l’app partagent la même base.
+- **App Next** : `src/app/` (`layout.tsx`, `page.tsx`) — shell Geist / Tailwind sur `body`.
+- **Assets statiques** : `public/` — référencer avec des chemins `/...` depuis le web.
+
+## Tokens et styles
+
+- **Tailwind CSS v4** : entrée unique via `@import "tailwindcss";` dans `src/app/globals.css`.
+- **Variables sémantiques** : `:root` pour `--background`, `--foreground` ; extension **`@theme inline`** pour `--color-background`, `--color-foreground`, polices (`--font-sans`, `--font-mono` via variables Geist dans `layout.tsx`).
+- IMPORTANT : pour les couleurs et surfaces, préférer les **variables CSS / thème Tailwind** définies dans `globals.css` plutôt que des hex arbitraires dans les composants. Élargir `@theme` ou `:root` si de nouveaux tokens Figma sont stables.
+- Les exemples Storybook actuels utilisent encore des **fichiers CSS classiques** (ex. `button.css`) avec des valeurs en dur ; lors d’implémentations Figma nouvelles, **aligner progressivement** sur les tokens globaux et Tailwind pour rester cohérent avec `globals.css`.
+
+## Conventions de code
+
+- **TypeScript** strict ; composants React en **fonction** avec props typées (`interface` ou `type`).
+- **Imports** : alias `@/*` → `src/*` (voir `tsconfig.json`).
+- Nommage : composants **PascalCase**, fichiers composant alignés (`Button.tsx`).
+
+## Figma MCP — flux obligatoire
+
+Ne pas implémenter « à l’aveugle » à partir d’une seule capture.
+
+1. **`get_design_context`** sur le ou les nœuds exacts (frame / composant / variante), avec `fileKey` + `nodeId` issus du lien Figma.
+2. Si la réponse est trop volumineuse ou tronquée : **`get_metadata`** pour la carte des nœuds, puis **`get_design_context`** ciblé sur les sous-nœuds nécessaires.
+3. **`get_screenshot`** sur la même sélection pour référence visuelle et parité 1:1.
+4. Télécharger / utiliser les assets fournis par le MCP si présents ; ne pas inventer de visuels manquants sans le signaler.
+5. Traduire la sortie (souvent React + utilitaires) vers **les conventions de ce repo** : structure `src/stories/`, CSS co-localisé ou classes Tailwind selon le composant, tokens depuis `globals.css`.
+6. Vérifier le rendu (Storybook et/ou page Next) contre la capture Figma avant de considérer terminé.
+
+## Règles d’implémentation
+
+- Traiter la sortie MCP comme **spécification visuelle et structurelle**, pas comme style de code final.
+- Réutiliser les **composants existants** dans `src/stories/` quand ils correspondent ; étendre les props ou variantes plutôt que dupliquer.
+- Préserver **l’accessibilité** : sémantique HTML, états focus, libellés ; l’addon a11y Storybook est là pour valider.
+- Après ajout ou changement notable : mettre à jour ou ajouter une **story** dans le `*.stories.ts` correspondant.
+
+## Assets
+
+- Si le MCP indique une source locale (ex. localhost) pour une image/SVG, **l’utiliser telle quelle** pour l’intégration ; ne pas remplacer par un placeholder si une vraie ressource est fournie.
+- Enregistrer les fichiers téléchargés sous `public/` (ou le dossier d’assets prévu par l’équipe) et référencer par chemin public stable.
+
+## Icônes
+
+- Pas de bibliothèque d’icônes dédiée dans le dépôt pour l’instant : préférer les assets **fournis par Figma / MCP** ; sinon SVG inline ou fichiers dans `public/`, avec conventions de nom claires.
+
+## Storybook
+
+- Les nouveaux composants design system doivent avoir une **story** documentée (props, variantes).
+- Le preview charge **`src/app/globals.css`** : les stories doivent rester cohérentes avec les tokens globaux lorsque c’est possible.
