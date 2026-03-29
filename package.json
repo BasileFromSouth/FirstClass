@@ -1,7 +1,28 @@
 {
-  "name": "stoodio-design-system",
+  "name": "@stoodio-design-system/stoodio-design-system",
   "version": "0.1.0",
-  "private": true,
+  "description": "Stoodio design system — React components and static Storybook documentation.",
+  "keywords": [
+    "design-system",
+    "storybook",
+    "react",
+    "stoodio",
+    "components"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BasileFromSouth/FirstClass.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BasileFromSouth/FirstClass/issues"
+  },
+  "homepage": "https://github.com/BasileFromSouth/FirstClass#readme",
+  "publishConfig": {
+    "registry": "https://registry.figma.com/npm/5fafb79d-3ca1-42e0-a4e9-ced71ce2e017/registry/"
+  },
+  "files": [
+    "storybook-static"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,10 +30,13 @@
     "lint": "eslint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "prepublishOnly": "npm run build-storybook",
     "chromatic": "chromatic --exit-zero-on-changes",
+    "storybook:publish": "node scripts/chromatic-with-env.cjs",
     "figma:connect:parse": "node scripts/figma-with-env.cjs connect parse",
     "figma:connect:publish": "node scripts/figma-with-env.cjs connect publish",
-    "figma:connect:publish:dry-run": "node scripts/figma-with-env.cjs connect publish --dry-run"
+    "figma:connect:publish:dry-run": "node scripts/figma-with-env.cjs connect publish --dry-run",
+    "publish:figma": "node scripts/publish-figma-npm.cjs"
   },
   "dependencies": {
     "next": "16.2.1",

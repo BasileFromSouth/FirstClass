@@ -1,5 +1,52 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Storybook et registre npm (Figma Make)
+
+Le paquet est publié sous le scope **Figma Make** : `@stoodio-design-system/stoodio-design-system`. Le build statique Storybook est dans `storybook-static/` (généré par `prepublishOnly`).
+
+### Publier vers le registre Figma
+
+1. Dans Figma Make, ouvre **npm registry setup** et copie le bloc `.npmrc` (URL du registre + jeton).
+2. Ce dépôt contient déjà `.npmrc` avec la bonne URL ; le jeton ne doit **pas** être commité. Soit tu définis une variable d’environnement avant `npm publish`, soit tu ajoutes la ligne `_authToken=...` dans le `.npmrc` **utilisateur** (`~/.npmrc` sur macOS/Linux).
+
+   **Recommandé** : mets la clé dans `.env` (déjà ignoré par git) :
+
+   ```env
+   FIGMA_NPM_TOKEN=figp_...
+   ```
+
+   Puis :
+
+   ```bash
+   npm run publish:figma
+   ```
+
+   (Ce script charge `.env` puis lance `npm publish`, ce qui remplit `${FIGMA_NPM_TOKEN}` dans le `.npmrc` du projet.)
+
+   **Alternative** : PowerShell sans `.env` :
+
+   ```powershell
+   $env:FIGMA_NPM_TOKEN="figp_..."
+   npm publish
+   ```
+
+3. `package.json` contient `publishConfig.registry` pointant vers le même registre Figma. La ligne `@stoodio-design-system:registry=…` est déjà dans le `.npmrc` du dépôt ; **ne commite pas** la ligne `_authToken=…` avec une vraie clé.
+
+Si tu as déjà exposé une clé (capture d’écran, chat), **régénère-la** dans Figma et mets à jour ton `.env` / ta machine — ne la commite jamais.
+
+### Consulter Storybook après installation
+
+Avec le même `.npmrc` (scope + auth) que pour la publication :
+
+```bash
+npm install @stoodio-design-system/stoodio-design-system
+npx serve node_modules/@stoodio-design-system/stoodio-design-system/storybook-static
+```
+
+Pour la revue visuelle sur npm public classique, ce flux est distinct ; ici la cible est le **registre privé Figma** indiqué dans Make.
+
+For team review and visual regression, this repo also supports [Chromatic](https://www.chromatic.com/) via `npm run chromatic`.
+
 ## Getting Started
 
 First, run the development server:
