@@ -1,0 +1,10 @@
+{
+  "codeConnect": {
+    "parser": "react",
+    "label": "Storybook",
+    "include": ["src/**/*.tsx", "src/**/*.jsx"],
+    "storybook": {
+      "url": "http://localhost:6006"
+    }
+  }
+}

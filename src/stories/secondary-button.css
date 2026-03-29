@@ -1,0 +1,113 @@
+/* Button Secondary — aligné Figma (fond surface, bordure) */
+
+.stoodio-secondary-button {
+  --btn-pad-x: 1rem;
+  --btn-pad-y: 0.5rem;
+  --btn-font: 0.875rem;
+  --btn-gap: 0.5rem;
+  --btn-radius: 0.5rem;
+  --btn-min-height: 2.5rem;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap);
+  box-sizing: border-box;
+  min-height: var(--btn-min-height);
+  padding: var(--btn-pad-y) var(--btn-pad-x);
+  border: 1px solid var(--display-border-default);
+  border-radius: var(--btn-radius);
+  font-family: inherit;
+  font-size: var(--btn-font);
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  background: var(--display-surface-canvas);
+  color: var(--display-text-primary);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.stoodio-secondary-button:hover:not(:disabled) {
+  background: var(--display-surface-elevated);
+}
+
+.stoodio-secondary-button:focus-visible {
+  outline: 2px solid var(--display-accent-primary);
+  outline-offset: 2px;
+}
+
+.stoodio-secondary-button:active:not(:disabled) {
+  background: var(--display-surface-elevated);
+  opacity: 0.92;
+}
+
+.stoodio-secondary-button:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  color: var(--display-text-secondary);
+}
+
+.stoodio-secondary-button__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.stoodio-secondary-button__label {
+  white-space: nowrap;
+}
+
+.stoodio-secondary-button__dropdown {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.stoodio-secondary-button--size-small {
+  --btn-pad-x: 0.75rem;
+  --btn-pad-y: 0.375rem;
+  --btn-font: 0.75rem;
+  --btn-gap: 0.375rem;
+  --btn-min-height: 2rem;
+}
+
+.stoodio-secondary-button--size-medium {
+  --btn-pad-x: 1rem;
+  --btn-pad-y: 0.5rem;
+  --btn-font: 0.875rem;
+  --btn-gap: 0.5rem;
+  --btn-min-height: 2.5rem;
+}
+
+.stoodio-secondary-button--size-large {
+  --btn-pad-x: 1.25rem;
+  --btn-pad-y: 0.625rem;
+  --btn-font: 1rem;
+  --btn-gap: 0.5rem;
+  --btn-min-height: 3rem;
+}
+
+.stoodio-secondary-button--shape-rounded.stoodio-secondary-button--size-small {
+  --btn-radius: 0.375rem;
+}
+.stoodio-secondary-button--shape-rounded.stoodio-secondary-button--size-medium {
+  --btn-radius: 0.5rem;
+}
+.stoodio-secondary-button--shape-rounded.stoodio-secondary-button--size-large {
+  --btn-radius: 0.625rem;
+}
+
+.stoodio-secondary-button--shape-square {
+  --btn-radius: 0;
+}
+
+.stoodio-secondary-button--shape-pill {
+  border-radius: 9999px;
+}
