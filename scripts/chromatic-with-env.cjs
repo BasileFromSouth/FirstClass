@@ -14,7 +14,7 @@ require('dotenv').config({
 if (!process.env.CHROMATIC_PROJECT_TOKEN?.trim()) {
   console.error(
     'Missing CHROMATIC_PROJECT_TOKEN. Add it to .env (see .env.example) or run:\n' +
-      '  npx chromatic --project-token=chpt_... --exit-zero-on-changes',
+      '  npx chromatic --project-token=chpt_... --exit-zero-on-changes --force-rebuild',
   );
   process.exit(1);
 }
@@ -28,7 +28,11 @@ const chromaticCli = path.join(
   'bin.js',
 );
 
-const args = ['--exit-zero-on-changes', ...process.argv.slice(2)];
+const args = [
+  '--exit-zero-on-changes',
+  '--force-rebuild',
+  ...process.argv.slice(2),
+];
 const result = spawnSync(process.execPath, [chromaticCli, ...args], {
   cwd,
   stdio: 'inherit',
