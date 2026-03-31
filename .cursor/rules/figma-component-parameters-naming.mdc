@@ -9,6 +9,8 @@ Consult this when **creating, renaming, or auditing** Figma artifacts: **pages**
 
 **Reference (philosophy):** [Your design system wasn’t built for AI](https://medium.com/design-bootcamp/your-design-system-wasnt-built-for-ai-here-s-what-to-do-about-it-69e9cba80f1f) — object-oriented cues in file structure and names; encode **objects**, **attributes**, **states**, and **capabilities**, not only pixels.
 
+**Fichier DS Stoodio (variables & styles)** — [DS Styles sur Figma](https://www.figma.com/design/3asFmiQJbu3XBt9ubUcjiA/-DS----Styles) (`fileKey` **3asFmiQJbu3XBt9ubUcjiA** ; nom de fichier **\[DS\] - Styles**). Les règles **`Display mode`** ci‑dessous sont alignées sur **`ds-tokens-builder`** : pas de dossier **`Semantics`** ; les rôles chromatiques / par composant vivent sous **`{Category}/Components/{Component}/…`** quand le composant publié le requiert.
+
 ---
 
 ## Principles for agent-native names (LLM-friendly)
@@ -69,18 +71,18 @@ Two families; pick by **what the flag means** (agents use this to infer UI rules
 ### Rule 1 — Primitive colors: name the **pigment**, not the **meaning**
 
 - In **`Primitive` / `Colors/…`**, tokens describe **chroma** (hue + shade or alpha): e.g. `Colors/neutral/neutral-500`, `Colors/yellow/yellow-600`.
-- **Do not** encode product semantics in **`Colors/…`** paths: no `primary`, `success`, `button`, `card`, `destructive`, etc. as folder or leaf names under primitives. Those roles belong in **`Display mode`** as **aliases** to chroma primitives.
-- When docs say “primary uses *500*”, that means the **semantic** token resolves to something like **`{hue}-500`**, not a primitive named `Colors/primary/…`.
+- **Do not** encode product semantics in **`Colors/…`** paths: no `primary`, `success`, `button`, `card`, `destructive`, etc. as folder or leaf names under primitives. Product roles are expressed in **`Display mode`** as **`VARIABLE_ALIAS`** paths — **not** under a separate **`{Category}/Semantics/`** tree: neutral tokens use **`Defaults`**; chromatic / component roles use **`{Category}/Components/{Component}/…`** when that published component (or its brief) introduces them.
+- When docs say “primary uses *500*”, that means the **Display mode** alias resolves to something like **`{hue}-500`**, not a primitive named `Colors/primary/…`.
 
-### Color tokens — `Primitive` vs `Display mode` (generic + component-scoped)
+### Color tokens — `Primitive` vs `Display mode` (`Defaults` + `Components` only)
 
 | Layer | Collection | What to encode | Examples |
 |--------|------------|----------------|----------|
 | **Primitive** | `Primitive` / `Colors/…` | **Chroma only** — hue + scale step or alpha. **No** product role, component, or state in the path. | `Colors/blue/blue-500`, `Colors/neutral/neutral-800` |
-| **Generic semantic** | `Display mode` | **Reusable roles** — `Defaults` and `Semantics` under each **category root**. Keep these for cross-app, non–component-specific usage. | `Texts/Semantics/text-primary`, `Icons/Semantics/icon-primary`, `Borders/Defaults/border-high`, `Surfaces/Semantics/surface-primary` |
-| **Component-specific** | `Display mode` | **Scoped aliases** under the **same category** as generics: **`{Category}/Components/{Component}/…`**. Still **aliases** to `Primitive` colors only — no raw hex. Scales to **every** published component that needs dedicated colors. | `Surfaces/Components/Button/surface-button-primary`, `Surfaces/Components/Button/surface-button-primary-hover`, `Borders/Components/Button/border-button-primary-focus` |
+| **Neutral transverse** | `Display mode` | **`Defaults` only** under each category root — neutral UI (high / middle / low, etc.) plus **Constant** / **Constant inverse** pairs for text & icons. **Do not** create **`Texts/Semantics/…`**, **`Surfaces/Semantics/…`**, or parallel **`Semantics`** folders for a “global semantic” layer at token bootstrap. | `Texts/Defaults/text-high`, `Icons/Defaults/icon-high`, `Borders/Defaults/border-high`, `Surfaces/Defaults/surface-high` |
+| **Component-scoped** | `Display mode` | **All** non-neutral color roles tied to shipped UI: chrome, states, **and** chromatic roles (`primary`, `success`, …) **when** the **published** component needs them — **`{Category}/Components/{Component}/…`**. Still **aliases** to `Primitive` colors only — no raw hex. | `Surfaces/Components/Button/surface-button-primary`, `Texts/Components/Button/text-button-label`, `Borders/Components/Button/border-button-primary-focus` |
 
-**Classification (no mixed “Components” root):** Component-scoped tokens are **sorted under the visual category** — `Texts/`, `Icons/`, `Borders/`, `Surfaces/`, `Backgrounds/`. Each category gets its own `Components/{Component}/` subtree when that component consumes a color in that category (e.g. button label under `Texts/Components/Button/`, button fill under `Surfaces/Components/Button/`).
+**Classification (no mixed “Components” root):** Tokens under **`Components`** are **sorted under the visual category** — `Texts/`, `Icons/`, `Borders/`, `Surfaces/`, `Backgrounds/`. Each category gets its own `Components/{Component}/` subtree when that component consumes a color there (e.g. button label under `Texts/Components/Button/`, button fill under `Surfaces/Components/Button/`).
 
 **Path pattern (component layer):** `{Category}/Components/{Component}/{prefix}-{component-kebab}-{role}[-{state}]`
 
@@ -89,7 +91,7 @@ Two families; pick by **what the flag means** (agents use this to infer UI rules
 - **`{prefix}`** — must match category: `text-`, `icon-`, `border-`, `surface-`, `background-`.
 - **`{state}`** — optional suffix: `hover`, `pressed`, `disabled`, `focus`, `selected`, etc. (team glossary).
 
-**Scalability and workflow:** The pattern applies to **all** components in the library. **Do not** pre-create `Components/…` tokens for every component in an initial token pass unless the brief requires it; add **incrementally** when a **published** component needs a color that should not live as a generic `Semantics` name. Prefer reusing the **same** primitive (or the same generic semantic alias) when appearance matches; add component-scoped tokens when the role is **non-reusable** or would clutter `Semantics`.
+**Scalability and workflow:** The pattern applies to **all** components in the library. **Do not** pre-create `Components/…` tokens for every component in an initial token pass unless the brief requires it; add **incrementally** when a **published** component needs a dedicated color. Prefer reusing the **same** `Primitive` (or the same **`Defaults`** alias) when appearance matches; add **`Components/{Component}/…`** tokens when the role is **non-reusable** as neutral default or is **owned by that component**.
 
 ---
 
@@ -129,4 +131,4 @@ Two families; pick by **what the flag means** (agents use this to infer UI rules
 - [ ] **Text props** use **roles** (`Label`, `Title`, `Sub`, …).
 - [ ] **States/modes** exist beyond the happy path where the product has them.
 - [ ] **Variables** and **components** use **predictable paths** and **one vocabulary** for agents to search and bind.
-- [ ] **Primitive** color names are **hue/value** only (**Rule 1**); **semantics** live under **`Display mode`** as **`Defaults` / `Semantics`** (e.g. `icon-primary`, `border-high`); **component-scoped** colors use **`{Category}/Components/{Component}/…`** under **`Texts` / `Icons` / `Borders` / `Surfaces` / `Backgrounds`**, added incrementally when needed.
+- [ ] **Primitive** color names are **hue/value** only (**Rule 1**); **`Display mode`** uses **`Defaults`** (neutral + Constant / Constant inverse) and **`{Category}/Components/{Component}/…`** for component-owned and chromatic roles — **no** **`Semantics`** folder layer; **component-scoped** paths stay under **`Texts` / `Icons` / `Borders` / `Surfaces` / `Backgrounds`**, added incrementally when the component ships.
