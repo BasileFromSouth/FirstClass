@@ -1,10 +1,6 @@
 ---
-description: Rules for implementing Figma designs via the Figma MCP server in this Next.js design system repo. Covers tokens, Storybook components, Tailwind v4, and the required design-context workflow.
-globs:
-  - "src/**/*.tsx"
-  - "src/**/*.ts"
-  - "src/**/*.css"
-alwaysApply: false
+description: 
+alwaysApply: true
 ---
 
 # Figma → code (Stoodio design system)
@@ -27,6 +23,12 @@ alwaysApply: false
 - **Variables sémantiques** : `:root` pour `--background`, `--foreground` ; extension **`@theme inline`** pour `--color-background`, `--color-foreground`, polices (`--font-sans`, `--font-mono` via variables Geist dans `layout.tsx`).
 - IMPORTANT : pour les couleurs et surfaces, préférer les **variables CSS / thème Tailwind** définies dans `globals.css` plutôt que des hex arbitraires dans les composants. Élargir `@theme` ou `:root` si de nouveaux tokens Figma sont stables.
 - Les exemples Storybook actuels utilisent encore des **fichiers CSS classiques** (ex. `button.css`) avec des valeurs en dur ; lors d’implémentations Figma nouvelles, **aligner progressivement** sur les tokens globaux et Tailwind pour rester cohérent avec `globals.css`.
+
+## Figma — Primitive vs autres collections (composants et maquettes)
+
+- Lors de la **création ou la mise à jour de composants** ou de **designs** (frames, écrans, instances) dans Figma, **ne pas appliquer ni lier les variables de la collection Primitive** sur le canvas (fills, strokes, espacements, rayons, etc.).
+- La collection **Primitive** est **réservée** à : définir les **valeurs brutes** qui servent à **construire les styles** (text styles, effect styles, etc.) et à être **référencées par alias** depuis les **autres collections** de variables (**Display mode**, **Platform**, etc.). Pour **`Colors/`**, nommer par **teinte et nuance** (`blue-500`, `neutral-800`) — **pas** par sémantique produit (`primary`, `button`) : ces rôles sont des alias dans **Display mode** (voir **figma-component-parameters-naming** et **`ds-tokens-builder`**).
+- Sur composants et maquettes : utiliser **uniquement** des variables des collections **sémantiques / contextuelles** (ex. Display mode — **`Defaults`**, **`Semantics`**, ou **`{Catégorie}/Components/{Composant}/…`** pour les couleurs spécifiques à un composant, Platform) — cohérent avec `ds-tokens-builder` / `figma-generate-library` (fondations tokens d’abord, puis liaison sémantique sur le canvas).
 
 ## Conventions de code
 

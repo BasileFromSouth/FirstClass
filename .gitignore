@@ -42,3 +42,10 @@ next-env.d.ts
 
 *storybook.log
 storybook-static
+
+# Cursor — skills Figma : `%USERPROFILE%\.cursor\skills\` (voir AGENTS.md), pas dans le dépôt
+/.cursor/skills/
+
+# generated Figma import batches (local only)
+/.figma-phosphor-batches/
+/.figma-phosphor-svg-flat-batches/
