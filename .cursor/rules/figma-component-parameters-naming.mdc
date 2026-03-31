@@ -1,0 +1,132 @@
+---
+description: "Figma design-system naming: agent-friendly semantics (layers, variables, styles, components), component properties, variants, booleans, slots, and nesting. Use when naming or auditing anything in Figma libraries (use_figma/MCP, tokens, cc-figma-component, figma-generate-library, ds-page-builder)."
+alwaysApply: true
+---
+
+# Figma — NAMING_CONVENTION (design system, agent-friendly)
+
+Consult this when **creating, renaming, or auditing** Figma artifacts: **pages**, **frames/layers**, **variables/collections**, **text/effect styles**, **components**, and **component properties**. Goal: **one predictable vocabulary** for humans, devs, and **LLM/agents** (MCP, plugins, codegen) — close the **semantic gap** (appearance vs meaning).
+
+**Reference (philosophy):** [Your design system wasn’t built for AI](https://medium.com/design-bootcamp/your-design-system-wasnt-built-for-ai-here-s-what-to-do-about-it-69e9cba80f1f) — object-oriented cues in file structure and names; encode **objects**, **attributes**, **states**, and **capabilities**, not only pixels.
+
+---
+
+## Principles for agent-native names (LLM-friendly)
+
+1. **Name the object, not only the shell** — Prefer `SubscriptionCard`, `InvoiceRow`, `UserSummary` over generic `Card`, `Row`, `Block` when the instance is tied to a **domain entity**. Agents map names to product models; generics force guesswork.
+2. **Stable vocabulary** — One term per concept across variables, components, and layers (no mix of `primary` / `main` / `brand` for the same role). Agents search and compose by string match.
+3. **Explicit state and mode** — Model non–happy-path states (`Loading`, `Error`, `Empty`, `Disabled`) in **variants** or variables, not only in designers’ heads. Variant axes should read like enums: `State`, `Status`, `Mode`, `View`.
+4. **Variables = attributes; props = capabilities (when relevant)** — Collections/paths can reflect attributes (`…/status`, role, amount). Component properties that express **permissions or behavior** should read clearly to code: see **Booleans** below.
+5. **Predictable paths** — Use consistent collection and slash structure (`Domain/Attribute` or existing token taxonomy). Avoid cryptic abbreviations and one-off spellings agents cannot infer.
+6. **Describe intent in the label** — If two layers could look identical, the name must carry **role** or **binding** (what it is for), not `Group 47`.
+
+---
+
+## Casing (global)
+
+- **Property names** (variant axes, text, boolean, instance-swap labels): **Title Case** — e.g. `Size`, `Shape`, `Icon L`, `Action R`, `Main navigation`.
+- **Variant / dropdown values**: **Title Case** — e.g. `Large`, `Medium`, `X-Small`, `Past Due`, `Read Only`, `List Item`, `Idle`, `Full`.
+- **Pages / major sections** — Follow **ds-page-builder** manifest conventions; use readable **Title Case** for section titles. **ALL CAPS** only for intentional coarse regions (`HEADER`, `FOOTER`) when aligned with existing patterns.
+- **Layers inside published components** — Prefer **Title Case** or short **semantic** names; avoid `Frame 234` / `Rectangle 12` in shipped library internals when agents must diff structure.
+- **Icon / small leaf components** (swap targets): keep library names **short**; often **lowercase** (`plus`, `globe`) — **asset name**, not the property label.
+
+---
+
+## Components and variants
+
+- **Component name** — `[Domain][Role]` or `[Domain] [Role]` when domain-specific; keep **primitive** names (`Button`, `Input`) for truly generic UI atoms.
+- **Variant axes** — **Short nouns**, **one concern per axis**: `Size`, `Shape`, `Type`, `State`, `Status`, `Device`, `Mode`, `View`. Prefer **`Status`** values that match **real domain states** (`Trialing`, `Active`, `Past Due`, `Canceled`) where applicable, not only visual adjectives.
+- **Primary axes** — Besides `Size`/`Shape`, include axes that mirror **behavior** (`Mode = Read Only | Editable`, `View = List Item | Detail | Summary`) when the product has those modes.
+
+---
+
+## Booleans
+
+Two families; pick by **what the flag means** (agents use this to infer UI rules).
+
+### A — Visibility / chrome (presentation)
+
+- Name the **thing toggled** (presence), not `Show …` / `Has …` / `is…` for **pure layout chrome**.
+- **Disable** for disabled interaction — not `Disabled` / `isDisabled`.
+- Examples: `Tabs`, `Footer`, `Dropdown`, `Icon`, `Label`, `Placeholder`, `Chips`, `Helper`, `Previous`, `Next`, `Alert`, `Toast`, `Modal`, `Connected`, `Menu Avatar`, `Lighting`, `Agent Fin`.
+
+### B — Domain capabilities and data (product logic)
+
+- When the flag mirrors **permissions, entitlements, or data** (article: “capabilities”), use **explicit, code-alignable** wording in **Title Case** so agents and devs share one reading:
+  - **Can [action]** — e.g. `Can Cancel`, `Can Upgrade`
+  - **Has [condition]** — e.g. `Has Outstanding Balance`
+  - **Optional:** **Show [domain slice]** only when it encodes a **named product surface** (e.g. usage metrics), not arbitrary “show section 3”.
+- Prefer aligning **spelling** with variables/APIs (`Past Due` vs `pastDue`) per team convention; document the mapping once.
+
+---
+
+## Variables and tokens
+
+- **Names encode meaning**, not only value — agents need to bind `#0055FF` to **role** via variable path/name (in **semantic** collections), or to **hue + shade** in **primitives**.
+- **Modes and collections** — Structure so **mode** (light/dark, platform) is consistent; avoid duplicating the same semantic under unrelated labels.
+- **No synonym sprawl** — Same semantic → same path pattern across files when possible.
+
+### Rule 1 — Primitive colors: name the **pigment**, not the **meaning**
+
+- In **`Primitive` / `Colors/…`**, tokens describe **chroma** (hue + shade or alpha): e.g. `Colors/neutral/neutral-500`, `Colors/yellow/yellow-600`.
+- **Do not** encode product semantics in **`Colors/…`** paths: no `primary`, `success`, `button`, `card`, `destructive`, etc. as folder or leaf names under primitives. Those roles belong in **`Display mode`** as **aliases** to chroma primitives.
+- When docs say “primary uses *500*”, that means the **semantic** token resolves to something like **`{hue}-500`**, not a primitive named `Colors/primary/…`.
+
+### Color tokens — `Primitive` vs `Display mode` (generic + component-scoped)
+
+| Layer | Collection | What to encode | Examples |
+|--------|------------|----------------|----------|
+| **Primitive** | `Primitive` / `Colors/…` | **Chroma only** — hue + scale step or alpha. **No** product role, component, or state in the path. | `Colors/blue/blue-500`, `Colors/neutral/neutral-800` |
+| **Generic semantic** | `Display mode` | **Reusable roles** — `Defaults` and `Semantics` under each **category root**. Keep these for cross-app, non–component-specific usage. | `Texts/Semantics/text-primary`, `Icons/Semantics/icon-primary`, `Borders/Defaults/border-high`, `Surfaces/Semantics/surface-primary` |
+| **Component-specific** | `Display mode` | **Scoped aliases** under the **same category** as generics: **`{Category}/Components/{Component}/…`**. Still **aliases** to `Primitive` colors only — no raw hex. Scales to **every** published component that needs dedicated colors. | `Surfaces/Components/Button/surface-button-primary`, `Surfaces/Components/Button/surface-button-primary-hover`, `Borders/Components/Button/border-button-primary-focus` |
+
+**Classification (no mixed “Components” root):** Component-scoped tokens are **sorted under the visual category** — `Texts/`, `Icons/`, `Borders/`, `Surfaces/`, `Backgrounds/`. Each category gets its own `Components/{Component}/` subtree when that component consumes a color in that category (e.g. button label under `Texts/Components/Button/`, button fill under `Surfaces/Components/Button/`).
+
+**Path pattern (component layer):** `{Category}/Components/{Component}/{prefix}-{component-kebab}-{role}[-{state}]`
+
+- **`{Component}`** — PascalCase, matches the published component name (`Button`, `TextField`).
+- **`{component-kebab}`** — kebab-case in the **token leaf** (`button`, `text-field`).
+- **`{prefix}`** — must match category: `text-`, `icon-`, `border-`, `surface-`, `background-`.
+- **`{state}`** — optional suffix: `hover`, `pressed`, `disabled`, `focus`, `selected`, etc. (team glossary).
+
+**Scalability and workflow:** The pattern applies to **all** components in the library. **Do not** pre-create `Components/…` tokens for every component in an initial token pass unless the brief requires it; add **incrementally** when a **published** component needs a color that should not live as a generic `Semantics` name. Prefer reusing the **same** primitive (or the same generic semantic alias) when appearance matches; add component-scoped tokens when the role is **non-reusable** or would clutter `Semantics`.
+
+---
+
+## Text and content properties
+
+- Name by **semantic role**: `Label`, `Title`, `Sub`, `Value`, `Input` (placeholder copy) — not `Text` / `String1` unless truly generic.
+
+---
+
+## Positions and repeated slots
+
+- **Left / right**: **`L`** / **`R`** with a **space** — `Icon L`, `Icon R`, `Action L`, `Action R`.
+- **Multiple similar actions**: **`Action 1`**, **`Action 2`**, **`Action 3`** (arabic numerals).
+
+---
+
+## Instance swap
+
+- Label the **slot**: `Content`, `Left content`, or token/theme slots like `Lighting` → nested swap (`neutral`).
+- If a swap applies only when a boolean is on, **nest** the swap under that boolean; the swap describes **what** is swapped, not “instance”.
+
+---
+
+## Groups and nesting (component properties)
+
+- Group related props (`Content`, `Status`, `Selector`, `Footer`, `HEADER` / `FOOTER`).
+- **Avoid** dev-style group names with a **leading dot** or raw **camelCase** in published components (e.g. `.headerDrawer`) — use readable **Title Case** (`Header`, `Header drawer`).
+
+---
+
+## Checklist (shipping / audit)
+
+- [ ] Names favor **objects + roles** where the UI is domain-specific; primitives stay generic.
+- [ ] **Property labels** and variant values use **Title Case** consistently; **no synonym drift** for the same concept.
+- [ ] **Booleans**: **A** (chrome) = **noun** toggles; **B** (domain) = **`Can` / `Has`** (or agreed capability pattern).
+- [ ] **Left/right** use **`L` / `R`** with space; stacked actions use **`Action N`**.
+- [ ] **Text props** use **roles** (`Label`, `Title`, `Sub`, …).
+- [ ] **States/modes** exist beyond the happy path where the product has them.
+- [ ] **Variables** and **components** use **predictable paths** and **one vocabulary** for agents to search and bind.
+- [ ] **Primitive** color names are **hue/value** only (**Rule 1**); **semantics** live under **`Display mode`** as **`Defaults` / `Semantics`** (e.g. `icon-primary`, `border-high`); **component-scoped** colors use **`{Category}/Components/{Component}/…`** under **`Texts` / `Icons` / `Borders` / `Surfaces` / `Backgrounds`**, added incrementally when needed.
